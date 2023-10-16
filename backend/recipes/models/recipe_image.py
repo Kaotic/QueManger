@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 from .recipe import Recipe
+
 
 class RecipeImage(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="images")

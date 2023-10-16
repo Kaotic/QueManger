@@ -1,6 +1,7 @@
 from django.db import models
 from .ingredient import Ingredient
 
+
 class Recipe(models.Model):
     DIFFICULTY_CHOICES = [
         ('easy', 'Facile'),

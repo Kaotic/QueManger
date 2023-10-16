@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from ..models import Recipe, RecipeImage, RecipeRating, RecipeIngredient
 
+
 class RecipeImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeImage
         fields = ['id', 'image_url']
+
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source='ingredient.name')
@@ -16,10 +18,12 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = RecipeIngredient
         fields = ['id', 'name', 'slug', 'image_url', 'complement', 'unit_name', 'quantity']
 
+
 class RecipeRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeRating
         fields = '__all__'
+
 
 class RecipeSerializer(serializers.ModelSerializer):
     images = RecipeImageSerializer(many=True, read_only=True)

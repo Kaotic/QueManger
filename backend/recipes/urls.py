@@ -13,32 +13,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+from django.urls import path
 
-from .api import MarmitonSearchAPI, MarmitonDetailAPI, MarmitonRandomAPI, MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId
-from .api import GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
+from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId
+from .api import GetAllUserRecipeLists, RemoveUserRecipeList, GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
 
 from .views import RecipeListCreate, recipe_list
 from .views import IngredientListCreate, ingredient_list
 
 urlpatterns = [
-    path('api/marmiton/random', MarmitonRandomJsonAPI.as_view(), name='marmiton_random'),
-    path('api/marmiton/add/random', MarmitonAddRandom.as_view(), name='marmiton_add_random'),
-    path('api/marmiton/add/id/<int:recipe_id>', MarmitonAddId.as_view(), name='marmiton_add_id'),
-    path('api/marmiton/detail/<str:recipe_slug>', MarmitonDetailAPI.as_view(), name='marmiton_detail'),
-    path('api/marmiton/search/', MarmitonSearchAPI.as_view(), name='marmiton_search'),
+    # API Marmiton
+    path('api/marmiton/random', MarmitonRandomJsonAPI.as_view(), name='api-marmiton-random'),
+    path('api/marmiton/add/random', MarmitonAddRandom.as_view(), name='api-marmiton-add-random'),
+    path('api/marmiton/add/id/<int:recipe_id>', MarmitonAddId.as_view(), name='api-marmiton-add-id'),
 
+    # API User Recipes
+    path('api/user/recipes', GetAllUserRecipeLists.as_view(), name='api-user-recipes'),
+    path('api/user/recipes/<int:user_recipe_id>', GetUserRecipeList.as_view(), name='api-user-recipes-get'),
+    path('api/user/recipes/<int:user_recipe_id>/remove', RemoveUserRecipeList.as_view(), name='api-user-recipes-remove'),
+    path('api/user/recipes/<int:user_recipe_id>/shop', ShopListForUserRecipeList.as_view(), name='api-user-recipes-shop-list'),
+    path('api/user/recipes/<int:user_recipe_id>/add/<int:recipe_id>', AddRecipeToUserRecipeList.as_view(), name='api-user-recipes-add-recipe'),
+    path('api/user/recipes/<int:user_recipe_id>/remove/<int:recipe_id>', RemoveRecipeFromUserRecipeList.as_view(), name='api-user-recipes-remove-recipe'),
+
+    # Base
     path('recipes/', RecipeListCreate.as_view(), name='recipes-list-create'),
     path('recipes/list', recipe_list, name='recipes-list'),
 
     path('ingredients/', IngredientListCreate.as_view(), name='ingredients-list-create'),
     path('ingredients/list', ingredient_list, name='ingredients-list'),
-
-    # User Recipes
-    path('api/user/recipes/<int:user_recipe_id>/add/<int:recipe_id>', AddRecipeToUserRecipeList.as_view(), name='user-recipes-add-recipe'),
-    path('api/user/recipes/<int:user_recipe_id>/remove/<int:recipe_id>', RemoveRecipeFromUserRecipeList.as_view(), name='user-recipes-remove-recipe'),
-    path('api/user/recipes/<int:user_recipe_id>', GetUserRecipeList.as_view(), name='user-recipes-get-list'),
-    path('api/user/recipes/<int:user_recipe_id>/shop', ShopListForUserRecipeList.as_view(), name='user-recipes-get-shop-list'),
 ]

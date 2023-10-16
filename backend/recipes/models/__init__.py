@@ -1,5 +1,3 @@
-# models/__init__.py
-
 from .ingredient import Ingredient
 from .ingredient_rating import IngredientRating
 from .recipe import Recipe

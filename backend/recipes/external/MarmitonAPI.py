@@ -1,6 +1,8 @@
 import requests
 import re
+
 from ..models import Recipe, Ingredient, RecipeIngredient, RecipeImage
+
 
 class MarmitonAPI:
     @staticmethod
@@ -113,21 +115,16 @@ class MarmitonAPI:
         return new_recipe
 
     @staticmethod
-    def add_recipe_id_to_db(recipeId):
+    def add_recipe_id_to_db(recipe_id):
         """Ajoute une recette à la base de données en utilisant son ID."""
-        recipe = MarmitonAPI.get_recipe_by_id(recipeId)
+        recipe = MarmitonAPI.get_recipe_by_id(recipe_id)
         return MarmitonAPI.add_recipe_to_db(recipe)
 
     @staticmethod
-    def add_recipe_url_to_db(recipeUrl):
+    def add_recipe_url_to_db(recipe_url):
         """Ajoute une recette à la base de données en utilisant son URL."""
-        recipe_id = MarmitonAPI.extract_id_from_url(recipeUrl)
+        recipe_id = MarmitonAPI.extract_id_from_url(recipe_url)
         recipe = MarmitonAPI.get_recipe_by_id(recipe_id)
         return MarmitonAPI.add_recipe_to_db(recipe)
 
 
-# Test
-#api = MarmitonAPI()
-#print(api.get_redirect_location())
-#print(api.extract_id_from_url("https://www.marmiton.org/recettes/recette_wraps-de-poulet-et-sauce-au-curry_337319.aspx"))
-#print(api.get_recipe_by_id(337319))

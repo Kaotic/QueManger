@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from .ingredient import Ingredient
 
+
 class IngredientRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)

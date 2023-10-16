@@ -1,34 +1,59 @@
-import json
-
-from django.shortcuts import render
-from rest_framework import generics
-from ..models import Recipe, RecipesList
-from ..serializers import RecipeSerializer
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from ..models import Recipe, RecipesList
 from ..external import MarmitonAPI
 from ..serializers import RecipesListSerializer
+
+
+class GetAllUserRecipeLists(APIView):
+    def get(self, request, format=None):
+        try:
+            if not request.user.is_authenticated:
+                return Response({"error": "You must be logged in to add a recipe to a list"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            user_recipes = RecipesList.objects.filter(user=request.user)
+            return Response(RecipesListSerializer(user_recipes, many=True).data)
+        except Exception as e:
+            return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RemoveUserRecipeList(APIView):
+    def get(self, request, user_recipe_id, format=None):
+        try:
+            if not request.user.is_authenticated:
+                return Response({"error": "You must be logged in to add a recipe to a list"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            try:
+                user_recipe = RecipesList.objects.get(id=user_recipe_id)
+                if user_recipe.user != request.user:
+                    return Response({"error": "You must be the owner of the list to add a recipe"}, status=status.HTTP_401_UNAUTHORIZED)
+            except RecipesList.DoesNotExist:
+                return Response({"error": "List not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            user_recipe.delete()
+
+            return Response({"success": "List deleted"})
+        except Exception as e:
+            return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetUserRecipeList(APIView):
     def get(self, request, user_recipe_id, format=None):
         try:
             if not request.user.is_authenticated:
-                return Response({"error": "You must be logged in to add a recipe to a list"},
-                                status=status.HTTP_401_UNAUTHORIZED)
+                return Response({"error": "You must be logged in to add a recipe to a list"}, status=status.HTTP_401_UNAUTHORIZED)
 
             try:
                 user_recipe = RecipesList.objects.get(id=user_recipe_id)
                 if user_recipe.user != request.user:
-                    return Response({"error": "You must be the owner of the list to add a recipe"},
-                                    status=status.HTTP_401_UNAUTHORIZED)
+                    return Response({"error": "You must be the owner of the list to add a recipe"}, status=status.HTTP_401_UNAUTHORIZED)
             except RecipesList.DoesNotExist:
                 return Response({"error": "List not found"}, status=status.HTTP_404_NOT_FOUND)
 
             return Response(RecipesListSerializer(user_recipe).data)
-        except:
+        except Exception as e:
             return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -36,10 +61,7 @@ class AddRecipeToUserRecipeList(APIView):
     def get(self, request, user_recipe_id, recipe_id, format=None):
         try:
             if not request.user.is_authenticated:
-                return Response({"error": "You must be logged in to add a recipe to a list"},
-                                status=status.HTTP_401_UNAUTHORIZED)
-
-            user_recipe = None
+                return Response({"error": "You must be logged in to add a recipe to a list"}, status=status.HTTP_401_UNAUTHORIZED)
 
             if user_recipe_id == "0" or user_recipe_id == 0:
                 user_recipe = RecipesList.objects.create(user=request.user)
@@ -47,12 +69,10 @@ class AddRecipeToUserRecipeList(APIView):
                 try:
                     user_recipe = RecipesList.objects.get(id=user_recipe_id)
                     if user_recipe.user != request.user:
-                        return Response({"error": "You must be the owner of the list to add a recipe"},
-                                        status=status.HTTP_401_UNAUTHORIZED)
+                        return Response({"error": "You must be the owner of the list to add a recipe"}, status=status.HTTP_401_UNAUTHORIZED)
                 except RecipesList.DoesNotExist:
                     return Response({"error": "List not found"}, status=status.HTTP_404_NOT_FOUND)
 
-            recipe = None
             try:
                 recipe = Recipe.objects.get(marmiton_id=recipe_id)
             except Recipe.DoesNotExist:
@@ -61,7 +81,7 @@ class AddRecipeToUserRecipeList(APIView):
                     if marmiton_recipe is None or marmiton_recipe.get("error") is not None:
                         return Response({"error": "Recipe on Marmiton not found"}, status=status.HTTP_404_NOT_FOUND)
                     recipe = MarmitonAPI.add_recipe_to_db(marmiton_recipe)
-                except:
+                except Exception as e:
                     return Response({"error": "Recipe not found"}, status=status.HTTP_404_NOT_FOUND)
 
             if not recipe in user_recipe.recipes.all():
@@ -69,7 +89,7 @@ class AddRecipeToUserRecipeList(APIView):
                 user_recipe.save()
 
             return Response(RecipesListSerializer(user_recipe).data)
-        except:
+        except Exception as e:
             return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -77,18 +97,15 @@ class RemoveRecipeFromUserRecipeList(APIView):
     def get(self, request, user_recipe_id, recipe_id, format=None):
         try:
             if not request.user.is_authenticated:
-                return Response({"error": "You must be logged in to remove a recipe from a list"},
-                                status=status.HTTP_401_UNAUTHORIZED)
+                return Response({"error": "You must be logged in to remove a recipe from a list"}, status=status.HTTP_401_UNAUTHORIZED)
 
             try:
                 user_recipe = RecipesList.objects.get(id=user_recipe_id)
                 if user_recipe.user != request.user:
-                    return Response({"error": "You must be the owner of the list to remove a recipe"},
-                                    status=status.HTTP_401_UNAUTHORIZED)
+                    return Response({"error": "You must be the owner of the list to remove a recipe"}, status=status.HTTP_401_UNAUTHORIZED)
             except RecipesList.DoesNotExist:
                 return Response({"error": "List not found"}, status=status.HTTP_404_NOT_FOUND)
 
-            recipe = None
             try:
                 recipe = Recipe.objects.get(marmiton_id=recipe_id)
             except Recipe.DoesNotExist:
@@ -99,51 +116,48 @@ class RemoveRecipeFromUserRecipeList(APIView):
                 user_recipe.save()
 
             return Response(RecipesListSerializer(user_recipe).data)
-        except:
+        except Exception as e:
             return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ShopListForUserRecipeList(APIView):
     def get(self, request, user_recipe_id, format=None):
         try:
-            print("test")
-        except:
+            if not request.user.is_authenticated:
+                return Response({"error": "You must be logged in to add a recipe to a list"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            try:
+                user_recipe = RecipesList.objects.get(id=user_recipe_id)
+                if user_recipe.user != request.user:
+                    return Response({"error": "You must be the owner of the list to add a recipe"}, status=status.HTTP_401_UNAUTHORIZED)
+            except RecipesList.DoesNotExist:
+                return Response({"error": "List not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            ingredients_list = []
+            for recipe in user_recipe.recipes.all():
+                for recipe_ingredient in recipe.ingredients.through.objects.filter(recipe=recipe):
+                    ingredient_found = False
+                    for ingredient in ingredients_list:
+                        if ingredient["id"] == recipe_ingredient.ingredient.id:
+                            ingredient_found = True
+                            if ingredient.get("complement") is None:
+                                ingredient["complement"] = recipe_ingredient.complement
+                            else:
+                                ingredient["complement"] += f" + {recipe_ingredient.complement}"
+                            ingredient["quantity"] += recipe_ingredient.quantity
+                            break
+
+                    if not ingredient_found:
+                        ingredients_list.append({
+                            "id": recipe_ingredient.ingredient.id,
+                            "name": recipe_ingredient.ingredient.name[0].upper() + recipe_ingredient.ingredient.name[1:],
+                            "complement": recipe_ingredient.complement,
+                            "quantity": recipe_ingredient.quantity,
+                            "unit_name": recipe_ingredient.ingredient.unit_name,
+                            "image_url": recipe_ingredient.ingredient.image_url,
+                        })
+
+            # Return the list of ingredients JSON formatted
+            return Response(ingredients_list)
+        except Exception as e:
             return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        if not request.user.is_authenticated:
-            return Response({"error": "You must be logged in to add a recipe to a list"},
-                            status=status.HTTP_401_UNAUTHORIZED)
-
-        try:
-            user_recipe = RecipesList.objects.get(id=user_recipe_id)
-            if user_recipe.user != request.user:
-                return Response({"error": "You must be the owner of the list to add a recipe"},
-                                status=status.HTTP_401_UNAUTHORIZED)
-        except RecipesList.DoesNotExist:
-            return Response({"error": "List not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # Foreach recipes in the list, takes all ingredients and add them to the final list
-
-        ingredients_list = []
-        for recipe in user_recipe.recipes.all():
-            for recipe_ingredient in recipe.ingredients.all():
-                # print type of recipe_ingredient
-                print(type(recipe_ingredient))
-                # if ingredient is not in the list, add it with quantity, otherwise, add quantity to the existing ingredient
-                ingredient_found = False
-                for ingredient in ingredients_list:
-                    if ingredient["name"] == recipe_ingredient.name:
-                        ingredient_found = True
-                        ingredient["quantity"] += recipe_ingredient.quantity
-                        break
-
-                if not ingredient_found:
-                    ingredients_list.append({
-                        "name": recipe_ingredient.name,
-                        "complement": recipe_ingredient.complement if recipe_ingredient.complement else "",
-                        "quantity": recipe_ingredient.quantity,
-                        "unit_name": recipe_ingredient.unit_name,
-                    })
-
-        # Return the list of ingredients JSON formatted
-        return Response(json.dumps(ingredients_list))

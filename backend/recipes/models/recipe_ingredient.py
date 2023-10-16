@@ -2,6 +2,7 @@ from django.db import models
 from .ingredient import Ingredient
 from .recipe import Recipe
 
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)

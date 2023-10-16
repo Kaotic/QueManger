@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}- Liste des ingrédients{% endblock %}
+
+{% block content %}
+  <h2>Ingrédients importés (x{{ ingredients|length }})</h2>
+  <ul>
+  {% for ingredient in ingredients %}
+    <li>{{ ingredient.name|capfirst }}</li>
+  {% endfor %}
+  </ul>
+{% endblock %}
