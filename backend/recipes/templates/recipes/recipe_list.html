@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Recettes importées (x{{ recipes|length }})</h2>
+  <ul>
+  {% for recipe in recipes %}
+    <li>{{ recipe.name }}</li>
+  {% endfor %}
+  </ul>
+{% endblock %}
