@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView
+from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration
 from .api import GetAllUserRecipeLists, RemoveUserRecipeList, GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
 
 from .views import RecipeListCreate, recipe_list, profile_get
@@ -27,6 +27,7 @@ urlpatterns = [
     path('profile/', profile_get),
     path('api/token', AuthTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/user/register', user_registration, name='user_registration'),
 
     # API Marmiton
     path('api/marmiton/random', MarmitonRandomJsonAPI.as_view(), name='api-marmiton-random'),
