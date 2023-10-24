@@ -1,3 +1,4 @@
+from .profile import Profile
 from .ingredient import Ingredient
 from .ingredient_rating import IngredientRating
 from .recipe import Recipe

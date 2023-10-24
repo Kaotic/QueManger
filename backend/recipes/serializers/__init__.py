@@ -1,3 +1,4 @@
+from .profile import ProfileSerializer
 from .ingredient import IngredientSerializer
 from .recipe import RecipeSerializer
 from .recipe_image import RecipeImageSerializer
