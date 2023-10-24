@@ -13,18 +13,56 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Footer from '../../components/layouts/Footer';
 import { useDispatch, useSelector } from 'react-redux';
+import api from '../../utils/api';
+import jwtDecode from 'jwt-decode';
+import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginScreen() {
+    const [isLoading, setIsLoading] = React.useState(false);
+
     const user = useSelector((state) => state.user);
     const dispatch = useDispatch();
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
     const handleSubmit = (event) => {
         event.preventDefault();
+
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
+        const username = data.get('username');
+        const password = data.get('password');
+
+        if(username.length < 3 || password.length < 3) {
+            enqueueSnackbar('Veuillez remplir tous les champs', { variant: 'error' });
+            return;
+        }
+
+        setIsLoading(true);
+
+        api.post('/api/token', {
+            username: data.get('username'),
             password: data.get('password'),
-        });
+        })
+            .then((response) => {
+                console.log(response);
+                if(response.status === 200 && response.data.refresh && response.data.access){
+                    let data = response.data;
+                    localStorage.setItem('authTokens', JSON.stringify(data));
+                    dispatch({ type: 'USER_LOGIN', auth: { access: data.access, refresh: data.refresh }, username, payload: jwtDecode(data.access) });
+                    enqueueSnackbar('Connexion réussie', { autoHideDuration: 1000, variant: 'success' });
+                    navigate('/');
+                }else{
+                    enqueueSnackbar('Identifiants incorrects', { variant: 'error' });
+                }
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                enqueueSnackbar('Identifiants incorrects', { variant: 'error' });
+                console.log(error);
+                setIsLoading(false);
+            });
+
     };
 
     return (
@@ -50,10 +88,10 @@ export default function LoginScreen() {
                             margin="normal"
                             required
                             fullWidth
-                            id="email"
-                            label="Adresse email"
-                            name="email"
-                            autoComplete="email"
+                            id="username"
+                            label="Nom d'utilisateur"
+                            name="username"
+                            autoComplete="username"
                             autoFocus
                         />
                         <TextField
@@ -75,6 +113,7 @@ export default function LoginScreen() {
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
+                            disabled={isLoading}
                         >
                             Connexion
                         </Button>
