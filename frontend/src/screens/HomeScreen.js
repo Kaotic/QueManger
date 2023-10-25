@@ -14,8 +14,10 @@ import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment/moment';
 import { red } from '@mui/material/colors';
 import { translateCost, translateDifficulty, translateTime } from '../utils/translation';
+import { useSnackbar } from 'notistack';
 
 function HomeScreen() {
+	const { enqueueSnackbar } = useSnackbar();
 	const user = useSelector((state) => state.user);
 	const dispatch = useDispatch();
 
@@ -25,6 +27,21 @@ function HomeScreen() {
 	const [selectedRecipe, setSelectedRecipe] = React.useState(null);
 	const [marmitonUrl, setMarmitonUrl] = React.useState('');
 	const [marmitonRecipe, setMarmitonRecipe] = React.useState('');
+
+	const refreshLists = () => {
+		setIsLoading(true);
+		api.get('/api/user/recipes', { headers: { Authorization: `Bearer ${user.auth.access}` } })
+			.then((response) => {
+				if(response.status === 200){
+					setRecipesList(response.data);
+					setIsLoading(false);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				setIsLoading(false);
+			});
+	};
 
 	const handleSelectRecipe = (recipe) => {
 		setSelectedRecipe(recipe);
@@ -45,22 +62,48 @@ function HomeScreen() {
 			.catch((error) => {
 				console.log(error);
 				setIsLoading(false);
+				enqueueSnackbar('Une erreur est survenue lors de la récupération de la recette !', { variant: 'error' });
 			});
 	};
 
-	React.useEffect(() => {
+	const handleAddRecipeToList = () => {
 		setIsLoading(true);
-		api.get('/api/user/recipes', { headers: { Authorization: `Bearer ${user.auth.access}` } })
+
+		if(selectedList.length === 0){
+			enqueueSnackbar('Aucune liste sélectionnée !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		for(let i = 0; i < selectedList.recipes.length; i++){
+			if(selectedList.recipes[i].id === selectedRecipe.id){
+				enqueueSnackbar('La recette est déjà dans la liste !', { variant: 'error' });
+				setIsLoading(false);
+				return;
+			}
+		}
+
+		api.get(`/api/user/recipes/${selectedList.id}/add/${selectedRecipe.marmiton_id}`, { headers: { Authorization: `Bearer ${user.auth.access}` } })
 			.then((response) => {
 				if(response.status === 200){
-					setRecipesList(response.data);
 					setIsLoading(false);
+					enqueueSnackbar('Recette ajoutée à la liste.', { variant: 'success' });
+					selectedList.recipes.push(selectedRecipe);
 				}
 			})
 			.catch((error) => {
 				console.log(error);
 				setIsLoading(false);
+				enqueueSnackbar('Une erreur est survenue lors de l\'ajout de la recette à la liste !', { variant: 'error' });
 			});
+	};
+
+	const handleOpenMarmiton = () => {
+		window.open(selectedRecipe.marmiton_url, '_blank');
+	};
+
+	React.useEffect(() => {
+		refreshLists();
 	}, []);
 
 	return (
@@ -114,10 +157,10 @@ function HomeScreen() {
 							<Button variant="contained" color="primary" sx={{marginRight: 1}} onClick={handleRandomRecipe}>
 								Recette aléatoire
 							</Button>
-							<Button variant="contained" color="secondary" sx={{marginRight: 1}}>
+							<Button variant="contained" color="secondary" sx={{marginRight: 1}} onClick={handleOpenMarmiton}>
 								Aller à Marmiton
 							</Button>
-							<Button variant="contained" color="primary" disabled={!selectedRecipe}>
+							<Button variant="contained" color="primary" disabled={!selectedRecipe} onClick={handleAddRecipeToList}>
 								Ajouter à la liste
 							</Button>
 						</Paper>
