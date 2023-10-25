@@ -16,13 +16,16 @@ Including another URLconf
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration, fetch_marmiton_url
+from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration, fetch_marmiton_url, proxy_image
 from .api import GetAllUserRecipeLists, CreateUserRecipeList, RemoveUserRecipeList, GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
 
 from .views import RecipeListCreate, recipe_list, profile_get
 from .views import IngredientListCreate, ingredient_list
 
 urlpatterns = [
+    # Proxy Image
+    path('proxy/image', proxy_image, name='proxy-image'),
+
     # User
     path('profile/', profile_get),
     path('api/token', AuthTokenObtainPairView.as_view(), name='token_obtain_pair'),
