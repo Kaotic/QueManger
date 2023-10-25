@@ -33,6 +33,21 @@ function HomeScreen() {
 		}
 	};
 
+	const handleRandomRecipe = () => {
+		setIsLoading(true);
+		api.get('/api/marmiton/add/random')
+			.then((response) => {
+				if(response.status === 200){
+					handleSelectRecipe(response.data);
+					setIsLoading(false);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				setIsLoading(false);
+			});
+	};
+
 	React.useEffect(() => {
 		setIsLoading(true);
 		api.get('/api/user/recipes', { headers: { Authorization: `Bearer ${user.auth.access}` } })
@@ -96,7 +111,7 @@ function HomeScreen() {
                     <Paper elevation={3}>
                         <Typography variant="h6" sx={{textAlign: 'center'}}>{selectedRecipe?.name || 'Aucune recette sélectionnée'}</Typography>
 						<Paper elevation={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
-							<Button variant="contained" color="primary" sx={{marginRight: 1}}>
+							<Button variant="contained" color="primary" sx={{marginRight: 1}} onClick={handleRandomRecipe}>
 								Recette aléatoire
 							</Button>
 							<Button variant="contained" color="secondary" sx={{marginRight: 1}}>
