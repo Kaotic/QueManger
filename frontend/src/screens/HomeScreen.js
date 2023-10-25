@@ -3,7 +3,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { useDispatch, useSelector } from 'react-redux';
 import api from '../utils/api';
-import { Grid, Button, Paper, List, ListItem, ListItemButton, Avatar, ListItemText, ListItemAvatar, ListItemIcon, Card } from '@mui/material';
+import { Grid, Button, Paper, List, ListItemButton, Avatar, ListItemText, ListItemAvatar, ListItemIcon, Card, Box, ButtonGroup, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import DangerousIcon from '@mui/icons-material/Dangerous';
@@ -11,6 +11,11 @@ import StarRateIcon from '@mui/icons-material/StarRate';
 import EuroIcon from '@mui/icons-material/Euro';
 import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import LaunchIcon from '@mui/icons-material/Launch';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import moment from 'moment/moment';
 import { red } from '@mui/material/colors';
 import { translateCost, translateDifficulty, translateTime } from '../utils/translation';
@@ -28,8 +33,14 @@ function HomeScreen() {
 	const [marmitonUrl, setMarmitonUrl] = React.useState('');
 	const [marmitonRecipe, setMarmitonRecipe] = React.useState('');
 
+	const [removeListOpen, setRemoveListOpen] = React.useState(false);
+	const [removeRecipeOpen, setRemoveRecipeOpen] = React.useState(false);
+
 	const refreshLists = () => {
 		setIsLoading(true);
+		setSelectedList([]);
+		setRecipesList([]);
+
 		api.get('/api/user/recipes', { headers: { Authorization: `Bearer ${user.auth.access}` } })
 			.then((response) => {
 				if(response.status === 200){
@@ -43,6 +54,62 @@ function HomeScreen() {
 			});
 	};
 
+
+	// First column actions
+	const handleCreateList = () => {
+		setIsLoading(true);
+		api.get('/api/user/recipes/create', { headers: { Authorization: `Bearer ${user.auth.access}` } })
+			.then((response) => {
+				if(response.status === 200){
+					refreshLists();
+					enqueueSnackbar('Liste créée !', { variant: 'success' });
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				setIsLoading(false);
+			});
+	};
+
+	const handleRemoveList = () => {
+		if(selectedList.length === 0){
+			enqueueSnackbar('Aucune liste sélectionnée !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		setRemoveListOpen(true);
+	};
+
+	const handleRemoveListClose = () => {
+		setRemoveListOpen(false);
+	};
+
+	const handleRemoveListConfirm = () => {
+		setIsLoading(true);
+
+		if(selectedList.length === 0){
+			enqueueSnackbar('Aucune liste sélectionnée !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		api.get(`/api/user/recipes/${selectedList.id}/remove`, { headers: { Authorization: `Bearer ${user.auth.access}` } })
+			.then((response) => {
+				if(response.status === 200){
+					refreshLists();
+					setRemoveListOpen(false);
+					enqueueSnackbar('Liste supprimée.', { variant: 'success' });
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				setIsLoading(false);
+				setRemoveListOpen(false);
+				enqueueSnackbar('Une erreur est survenue lors de la suppression de la liste !', { variant: 'error' });
+			});
+	};
+
 	const handleSelectRecipe = (recipe) => {
 		setSelectedRecipe(recipe);
 		if(recipe?.marmiton_url) {
@@ -50,6 +117,70 @@ function HomeScreen() {
 		}
 	};
 
+
+	// Second column actions
+	const handleShopList = () => {
+		if(selectedList.length === 0){
+			enqueueSnackbar('Aucune liste sélectionnée !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		if(selectedList.recipes.length === 0){
+			enqueueSnackbar('Aucune recette dans cette liste !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+	};
+
+	const handleRemoveRecipeFromList = () => {
+		if(selectedList.length === 0){
+			enqueueSnackbar('Aucune liste sélectionnée !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		if(!selectedRecipe){
+			enqueueSnackbar('Aucune recette sélectionnée !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		if(selectedList.recipes.length === 0 || selectedList.recipes.filter((recipe) => recipe.id === selectedRecipe.id).length === 0){
+			enqueueSnackbar('La recette n\'est pas dans la liste !', { variant: 'error' });
+			setIsLoading(false);
+			return;
+		}
+
+		setRemoveRecipeOpen(true);
+	};
+
+	const handleRemoveRecipeFromListClose = () => {
+		setRemoveRecipeOpen(false);
+	};
+
+	const handleRemoveRecipeFromListConfirm = () => {
+		setIsLoading(true);
+		api.get(`/api/user/recipes/${selectedList.id}/remove/${selectedRecipe.marmiton_id}`, { headers: { Authorization: `Bearer ${user.auth.access}` } })
+			.then((response) => {
+				if(response.status === 200){
+					setIsLoading(false);
+					enqueueSnackbar('Recette supprimée de la liste.', { variant: 'success' });
+					selectedList.recipes = selectedList.recipes.filter((recipe) => recipe.id !== selectedRecipe.id);
+					setSelectedRecipe(null);
+					setRemoveRecipeOpen(false);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				setIsLoading(false);
+				enqueueSnackbar('Une erreur est survenue lors de la suppression de la recette de la liste !', { variant: 'error' });
+				setRemoveRecipeOpen(false);
+			});
+	};
+
+
+	// Third column actions
 	const handleRandomRecipe = () => {
 		setIsLoading(true);
 		api.get('/api/marmiton/add/random')
@@ -102,6 +233,7 @@ function HomeScreen() {
 		window.open(selectedRecipe.marmiton_url, '_blank');
 	};
 
+
 	React.useEffect(() => {
 		refreshLists();
 	}, []);
@@ -111,11 +243,21 @@ function HomeScreen() {
             <Grid container spacing={3}>
                 {/* Première colonne : Liste de mes recettes */}
                 <Grid item xs={3}>
+					<Box sx={{  display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
+						<ButtonGroup size="small" color="primary" aria-label="Contrôles de Marmiton">
+							<Button variant="outlined" disabled={isLoading} onClick={handleCreateList} endIcon={<AddCircleOutlineIcon />}>
+								Créer une liste
+							</Button>
+							<Button variant="outlined" color="error" disabled={isLoading} onClick={handleRemoveList} endIcon={<DeleteForeverIcon />}>
+								Supprimer la liste
+							</Button>
+						</ButtonGroup>
+					</Box>
                     <Paper elevation={3}>
                         <Typography variant="h6" sx={{textAlign: 'center'}}>Listes de recettes</Typography>
                         <List>
-                            {recipesList.map((list) => (
-                                <ListItemButton button onClick={() => setSelectedList(list)} key={list.id}>
+                            {recipesList.map((list, index) => (
+                                <ListItemButton disabled={isLoading} onClick={() => setSelectedList(list)} key={index}>
 									<ListItemAvatar>
 										<Avatar sx={{ bgcolor: 'primary.main' }}>#{list.id}</Avatar>
 									</ListItemAvatar>
@@ -131,11 +273,21 @@ function HomeScreen() {
 
                 {/* Deuxième colonne : Liste des recettes dans la liste sélectionnée */}
                 <Grid item xs={3}>
+					<Box sx={{  display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
+						<ButtonGroup size="small" color="primary" aria-label="Contrôles des recettes">
+							<Button variant="outlined" disabled={isLoading} onClick={handleShopList} endIcon={<ShoppingCartCheckoutIcon />}>
+								Liste de courses
+							</Button>
+							<Button variant="outlined" color="error" disabled={isLoading} onClick={handleRemoveRecipeFromList} endIcon={<DeleteForeverIcon />}>
+								Supprimer la recette
+							</Button>
+						</ButtonGroup>
+					</Box>
                     <Paper elevation={3}>
                         <Typography variant="h6" sx={{textAlign: 'center'}}>Recettes dans la liste</Typography>
                         <List>
-                            {selectedList.recipes?.map((recipe) => (
-                                <ListItemButton button onClick={() => handleSelectRecipe(recipe)} key={recipe.id}>
+                            {selectedList.recipes?.map((recipe, index) => (
+                                <ListItemButton disabled={isLoading} onClick={() => handleSelectRecipe(recipe)} key={index}>
 									<ListItemAvatar>
 										{recipe.images[0] ? <Avatar variant="square" src={recipe.images[0].image_url} /> : <Avatar variant="square" sx={{ bgcolor: red[500] }}><DangerousIcon /></Avatar>}
 									</ListItemAvatar>
@@ -151,44 +303,77 @@ function HomeScreen() {
 
                 {/* Troisième colonne : Conteneur Marmiton */}
                 <Grid item xs={6}>
-                    <Paper elevation={3}>
-                        <Typography variant="h6" sx={{textAlign: 'center'}}>{selectedRecipe?.name || 'Aucune recette sélectionnée'}</Typography>
-						<Paper elevation={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
-							<Button variant="contained" color="primary" sx={{marginRight: 1}} onClick={handleRandomRecipe}>
+					<Box sx={{  display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
+						<ButtonGroup size="small" color="primary" aria-label="Contrôles de Marmiton">
+							<Button variant="outlined" disabled={isLoading} onClick={handleRandomRecipe} endIcon={<AutorenewIcon />}>
 								Recette aléatoire
 							</Button>
-							<Button variant="contained" color="secondary" sx={{marginRight: 1}} onClick={handleOpenMarmiton}>
-								Aller à Marmiton
+							<Button variant="outlined" disabled={isLoading} onClick={handleOpenMarmiton} endIcon={<LaunchIcon />}>
+								Aller sur Marmiton
 							</Button>
-							<Button variant="contained" color="primary" disabled={!selectedRecipe} onClick={handleAddRecipeToList}>
+							<Button variant="outlined" disabled={isLoading} onClick={handleAddRecipeToList} endIcon={<AddCircleOutlineIcon />}>
 								Ajouter à la liste
 							</Button>
-						</Paper>
-						{selectedRecipe && (
-							<Paper elevation={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', marginBottom: 0.5 }}>
-								{/* Rating, difficulty, budget, total time designed with icons */}
-								<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
-									<StarRateIcon sx={{ marginRight: 1 }} />
-									<Typography variant="body1" sx={{ marginRight: 1 }}>{selectedRecipe.rating}</Typography>
-								</Card>
-								<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
-									<AccessAlarmIcon sx={{ marginRight: 1 }} />
-									<Typography variant="body1" sx={{ marginRight: 1 }}>{translateTime(selectedRecipe.preparation_time, selectedRecipe.rest_time, selectedRecipe.cooking_time)}</Typography>
-								</Card>
-								<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
-									<EuroIcon sx={{ marginRight: 1 }} />
-									<Typography variant="body1" sx={{ marginRight: 1 }}>{translateCost(selectedRecipe.budget)}</Typography>
-								</Card>
-								<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem' }}>
-									<RamenDiningIcon sx={{ marginRight: 1 }} />
-									<Typography variant="body1" sx={{ marginRight: 1 }}>{translateDifficulty(selectedRecipe.difficulty)}</Typography>
-								</Card>
-							</Paper>
-						)}
-                        <iframe src={marmitonUrl} title="Marmiton Recipe" style={{ width: '100%', height: '700px', border: 'none' }}></iframe>
+						</ButtonGroup>
+					</Box>
+                    <Paper elevation={3}>
+						<div style={{ justifyContent: 'center', alignItems: 'center' }}>
+							<Typography variant="h6" sx={{textAlign: 'center'}}>{selectedRecipe?.name || 'Aucune recette sélectionnée'}</Typography>
+							{selectedRecipe && (
+								<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', marginBottom: 0.5 }}>
+									<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
+										<StarRateIcon sx={{ marginRight: 1 }} />
+										<Typography variant="body1" sx={{ marginRight: 1 }}>{selectedRecipe.rating}</Typography>
+									</Card>
+									<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
+										<AccessAlarmIcon sx={{ marginRight: 1 }} />
+										<Typography variant="body1" sx={{ marginRight: 1 }}>{translateTime(selectedRecipe.preparation_time, selectedRecipe.rest_time, selectedRecipe.cooking_time)}</Typography>
+									</Card>
+									<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
+										<EuroIcon sx={{ marginRight: 1 }} />
+										<Typography variant="body1" sx={{ marginRight: 1 }}>{translateCost(selectedRecipe.budget)}</Typography>
+									</Card>
+									<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem' }}>
+										<RamenDiningIcon sx={{ marginRight: 1 }} />
+										<Typography variant="body1" sx={{ marginRight: 1 }}>{translateDifficulty(selectedRecipe.difficulty)}</Typography>
+									</Card>
+								</div>
+							)}
+						</div>
+                        {/* <iframe src={marmitonUrl} title="Marmiton Recipe" style={{ width: '100%', height: '700px', border: 'none' }}></iframe> */}
                     </Paper>
                 </Grid>
             </Grid>
+			<div>
+				<Dialog open={removeListOpen} onClose={handleRemoveListClose}>
+					<DialogTitle>Suppression de la liste</DialogTitle>
+					<DialogContent>
+						{selectedList.length > 0 && (
+							<DialogContentText>
+								Voulez-vous vraiment supprimer la liste "Semaine {selectedList.date_week} ({moment(selectedList.date_created).format('DD/MM/YYYY')})" ? Cette action est irréversible !
+							</DialogContentText>
+						)}
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={handleRemoveListClose} disabled={isLoading}>Annuler</Button>
+						<Button onClick={handleRemoveListConfirm} color="error" disabled={isLoading}>Confirmer la suppression</Button>
+					</DialogActions>
+				</Dialog>
+				<Dialog open={removeRecipeOpen} onClose={handleRemoveRecipeFromListClose}>
+					<DialogTitle>Suppression de la recette</DialogTitle>
+					<DialogContent>
+						{selectedRecipe && (
+							<DialogContentText>
+								Voulez-vous vraiment supprimer la recette "{selectedRecipe.name}" de la liste actuelle ? Cette action est irréversible !
+							</DialogContentText>
+						)}
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={handleRemoveRecipeFromListClose} disabled={isLoading}>Annuler</Button>
+						<Button onClick={handleRemoveRecipeFromListConfirm} color="error" disabled={isLoading}>Confirmer la suppression</Button>
+					</DialogActions>
+				</Dialog>
+			</div>
         </Container>
     );
 }
