@@ -3,7 +3,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { useSelector } from 'react-redux';
 import api, { API_URL, PROXY_IMAGE_URL } from '../utils/api';
-import { Grid, Button, Paper, List, ListItemButton, Avatar, ListItemText, ListItemAvatar, ListItemIcon, Card, Box, ButtonGroup, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Grid, Button, Paper, List, ListItemButton, Avatar, ListItemText, ListItemAvatar, ListItemIcon, Card, Box, ButtonGroup, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, ListItem } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import DangerousIcon from '@mui/icons-material/Dangerous';
@@ -27,6 +27,7 @@ function HomeScreen() {
 
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [recipesList, setRecipesList] = React.useState([]);
+	const [showedRecipes, setShowedRecipes] = React.useState(5);
 	const [selectedList, setSelectedList] = React.useState([]);
 	const [selectedRecipe, setSelectedRecipe] = React.useState(null);
 	const [marmitonUrl, setMarmitonUrl] = React.useState('');
@@ -42,7 +43,7 @@ function HomeScreen() {
 		api.get('/api/user/recipes', { headers: { Authorization: `Bearer ${user.auth.access}` } })
 			.then((response) => {
 				if(response.status === 200){
-					setRecipesList(response.data);
+					setRecipesList(response.data.sort((a, b) => b.id - a.id));
 					setIsLoading(false);
 				}
 			})
@@ -56,6 +57,7 @@ function HomeScreen() {
 	// First column actions
 	const handleCreateList = () => {
 		setIsLoading(true);
+
 		api.get('/api/user/recipes/create', { headers: { Authorization: `Bearer ${user.auth.access}` } })
 			.then((response) => {
 				if(response.status === 200){
@@ -159,6 +161,7 @@ function HomeScreen() {
 
 	const handleRemoveRecipeFromListConfirm = () => {
 		setIsLoading(true);
+
 		api.get(`/api/user/recipes/${selectedList.id}/remove/${selectedRecipe.marmiton_id}`, { headers: { Authorization: `Bearer ${user.auth.access}` } })
 			.then((response) => {
 				if(response.status === 200){
@@ -182,6 +185,7 @@ function HomeScreen() {
 	// Third column actions
 	const handleRandomRecipe = () => {
 		setIsLoading(true);
+
 		api.get('/api/marmiton/add/random')
 			.then((response) => {
 				if(response.status === 200){
@@ -255,7 +259,12 @@ function HomeScreen() {
                     <Paper elevation={3}>
                         <Typography variant="h6" sx={{ textAlign: 'center', paddingTop: 1 }}>Listes de recettes</Typography>
                         <List>
-                            {recipesList.map((list, index) => (
+							{recipesList.length === 0 && (
+								<ListItem>
+									<ListItemText sx={{ textAlign:'center' }} primary="Aucune liste de recettes !" />
+								</ListItem>
+							)}
+                            {recipesList.slice(0, showedRecipes).map((list, index) => (
                                 <ListItemButton disabled={isLoading} onClick={() => setSelectedList(list)} key={index}>
 									<ListItemAvatar>
 										<Avatar sx={{ bgcolor: 'primary.main' }}>#{list.id}</Avatar>
@@ -266,6 +275,16 @@ function HomeScreen() {
 									</ListItemIcon>
                                 </ListItemButton>
                             ))}
+							{recipesList.length > showedRecipes && (
+								<ListItemButton disabled={isLoading} onClick={() => setShowedRecipes(showedRecipes + 5)}>
+									<ListItemText sx={{ textAlign:'center' }} primary="Afficher plus..." />
+								</ListItemButton>
+							)}
+							{recipesList.length <= showedRecipes && recipesList.length > 5 && (
+								<ListItemButton disabled={isLoading} onClick={() => setShowedRecipes(5)}>
+									<ListItemText sx={{ textAlign:'center' }} primary="Afficher moins..." />
+								</ListItemButton>
+							)}
                         </List>
                     </Paper>
                 </Grid>
@@ -285,6 +304,11 @@ function HomeScreen() {
                     <Paper elevation={3}>
                         <Typography variant="h6" sx={{ textAlign: 'center', paddingTop: 1 }}>Recettes dans la liste</Typography>
                         <List>
+							{selectedList.recipes?.length === 0 && (
+								<ListItem>
+									<ListItemText sx={{ textAlign:'center' }} primary="Aucune recette dans la liste !" />
+								</ListItem>
+							)}
                             {selectedList.recipes?.map((recipe, index) => (
                                 <ListItemButton disabled={isLoading} onClick={() => handleSelectRecipe(recipe)} key={index}>
 									<ListItemAvatar>
@@ -356,11 +380,12 @@ function HomeScreen() {
                     </Paper>
                 </Grid>
             </Grid>
+
 			<div>
 				<Dialog open={removeListOpen} onClose={handleRemoveListClose}>
 					<DialogTitle>Suppression de la liste</DialogTitle>
 					<DialogContent>
-						{selectedList.length > 0 && (
+						{removeListOpen && (
 							<DialogContentText>
 								Voulez-vous vraiment supprimer la liste "Semaine {selectedList.date_week} ({moment(selectedList.date_created).format('DD/MM/YYYY')})" ? Cette action est irréversible !
 							</DialogContentText>
@@ -374,7 +399,7 @@ function HomeScreen() {
 				<Dialog open={removeRecipeOpen} onClose={handleRemoveRecipeFromListClose}>
 					<DialogTitle>Suppression de la recette</DialogTitle>
 					<DialogContent>
-						{selectedRecipe && (
+						{removeRecipeOpen && (
 							<DialogContentText>
 								Voulez-vous vraiment supprimer la recette "{selectedRecipe.name}" de la liste actuelle ? Cette action est irréversible !
 							</DialogContentText>
