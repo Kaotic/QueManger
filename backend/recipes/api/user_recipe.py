@@ -19,6 +19,18 @@ class GetAllUserRecipeLists(APIView):
             return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class CreateUserRecipeList(APIView):
+    def get(self, request, format=None):
+        try:
+            if not request.user.is_authenticated:
+                return Response({"error": "You must be logged in to add a recipe to a list"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            user_recipe = RecipesList.objects.create(user=request.user)
+            return Response(RecipesListSerializer(user_recipe).data)
+        except Exception as e:
+            return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class RemoveUserRecipeList(APIView):
     def get(self, request, user_recipe_id, format=None):
         try:

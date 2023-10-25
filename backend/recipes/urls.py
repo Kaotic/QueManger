@@ -16,9 +16,8 @@ Including another URLconf
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration, \
-    fetch_marmiton_url
-from .api import GetAllUserRecipeLists, RemoveUserRecipeList, GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
+from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration, fetch_marmiton_url
+from .api import GetAllUserRecipeLists, CreateUserRecipeList, RemoveUserRecipeList, GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
 
 from .views import RecipeListCreate, recipe_list, profile_get
 from .views import IngredientListCreate, ingredient_list
@@ -38,6 +37,7 @@ urlpatterns = [
 
     # API User Recipes
     path('api/user/recipes', GetAllUserRecipeLists.as_view(), name='api-user-recipes'),
+    path('api/user/recipes/create', CreateUserRecipeList.as_view(), name='api-user-recipes-create'),
     path('api/user/recipes/<int:user_recipe_id>', GetUserRecipeList.as_view(), name='api-user-recipes-get'),
     path('api/user/recipes/<int:user_recipe_id>/remove', RemoveUserRecipeList.as_view(), name='api-user-recipes-remove'),
     path('api/user/recipes/<int:user_recipe_id>/shop', ShopListForUserRecipeList.as_view(), name='api-user-recipes-shop-list'),
