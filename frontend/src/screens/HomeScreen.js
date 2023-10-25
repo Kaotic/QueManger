@@ -2,7 +2,7 @@ import React from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { useDispatch, useSelector } from 'react-redux';
-import api from '../utils/api';
+import api, { API_URL, PROXY_IMAGE_URL } from '../utils/api';
 import { Grid, Button, Paper, List, ListItemButton, Avatar, ListItemText, ListItemAvatar, ListItemIcon, Card, Box, ButtonGroup, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -113,7 +113,7 @@ function HomeScreen() {
 	const handleSelectRecipe = (recipe) => {
 		setSelectedRecipe(recipe);
 		if(recipe?.marmiton_url) {
-			setMarmitonUrl('http://localhost:8000/api/marmiton/fetch?url=' + recipe.marmiton_url);
+			setMarmitonUrl(API_URL + 'api/marmiton/fetch?url=' + recipe.marmiton_url);
 		}
 	};
 
@@ -289,7 +289,7 @@ function HomeScreen() {
                             {selectedList.recipes?.map((recipe, index) => (
                                 <ListItemButton disabled={isLoading} onClick={() => handleSelectRecipe(recipe)} key={index}>
 									<ListItemAvatar>
-										{recipe.images[0] ? <Avatar variant="square" src={recipe.images[0].image_url} /> : <Avatar variant="square" sx={{ bgcolor: red[500] }}><DangerousIcon /></Avatar>}
+										{recipe.images[0]?.image_url ? <Avatar variant="square" src={PROXY_IMAGE_URL + recipe.images[0].image_url} /> : <Avatar variant="square" sx={{ bgcolor: red[500] }}><DangerousIcon /></Avatar>}
 									</ListItemAvatar>
 									<ListItemText primary={recipe.name} secondary={``} />
 									<ListItemIcon>
