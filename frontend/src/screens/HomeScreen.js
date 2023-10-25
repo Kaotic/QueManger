@@ -1,7 +1,7 @@
 import React from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import api, { API_URL, PROXY_IMAGE_URL } from '../utils/api';
 import { Grid, Button, Paper, List, ListItemButton, Avatar, ListItemText, ListItemAvatar, ListItemIcon, Card, Box, ButtonGroup, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -24,14 +24,12 @@ import { useSnackbar } from 'notistack';
 function HomeScreen() {
 	const { enqueueSnackbar } = useSnackbar();
 	const user = useSelector((state) => state.user);
-	const dispatch = useDispatch();
 
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [recipesList, setRecipesList] = React.useState([]);
 	const [selectedList, setSelectedList] = React.useState([]);
 	const [selectedRecipe, setSelectedRecipe] = React.useState(null);
 	const [marmitonUrl, setMarmitonUrl] = React.useState('');
-	const [marmitonRecipe, setMarmitonRecipe] = React.useState('');
 
 	const [removeListOpen, setRemoveListOpen] = React.useState(false);
 	const [removeRecipeOpen, setRemoveRecipeOpen] = React.useState(false);
@@ -242,8 +240,8 @@ function HomeScreen() {
         <Container component="main" maxWidth={false} style={{ flexGrow: 1, padding: '2rem' }}>
             <Grid container spacing={3}>
                 {/* Première colonne : Liste de mes recettes */}
-                <Grid item xs={3}>
-					<Box sx={{  display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
+                <Grid item xs={12} xl={3}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
 						<ButtonGroup size="small" color="primary" aria-label="Contrôles de Marmiton">
 							<Button variant="outlined" disabled={isLoading} onClick={handleCreateList} endIcon={<AddCircleOutlineIcon />}>
 								Créer une liste
@@ -272,8 +270,8 @@ function HomeScreen() {
                 </Grid>
 
                 {/* Deuxième colonne : Liste des recettes dans la liste sélectionnée */}
-                <Grid item xs={3}>
-					<Box sx={{  display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
+                <Grid item xs={12} lg={6} xl={4}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
 						<ButtonGroup size="small" color="primary" aria-label="Contrôles des recettes">
 							<Button variant="outlined" disabled={isLoading} onClick={handleShopList} endIcon={<ShoppingCartCheckoutIcon />}>
 								Liste de courses
@@ -291,7 +289,20 @@ function HomeScreen() {
 									<ListItemAvatar>
 										{recipe.images[0]?.image_url ? <Avatar variant="square" src={PROXY_IMAGE_URL + recipe.images[0].image_url} /> : <Avatar variant="square" sx={{ bgcolor: red[500] }}><DangerousIcon /></Avatar>}
 									</ListItemAvatar>
-									<ListItemText primary={recipe.name} secondary={``} />
+									<ListItemText
+										primary={recipe.name}
+										secondary={
+											<React.Fragment>
+												<span><StarRateIcon sx={{ height: 12, width: 12, marginRight: 0.25 }} />{recipe.rating}</span>
+												<span> | </span>
+												<span><AccessAlarmIcon sx={{ height: 12, width: 12, marginRight: 0.25 }} />{translateTime(recipe.preparation_time, recipe.rest_time, recipe.cooking_time)}</span>
+												<span> | </span>
+												<span><EuroIcon sx={{ height: 12, width: 12, marginRight: 0.25 }} />{translateCost(recipe.budget)}</span>
+												<span> | </span>
+												<span><RamenDiningIcon sx={{ height: 12, width: 12, marginRight: 0.25 }} />{translateDifficulty(recipe.difficulty)}</span>
+											</React.Fragment>
+										}
+									/>
 									<ListItemIcon>
 										{recipe.id === selectedRecipe?.id ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
 									</ListItemIcon>
@@ -302,8 +313,8 @@ function HomeScreen() {
                 </Grid>
 
                 {/* Troisième colonne : Conteneur Marmiton */}
-                <Grid item xs={6}>
-					<Box sx={{  display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
+                <Grid item xs={12} lg={6} xl={5}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', '& > *': { m: 1 } }}>
 						<ButtonGroup size="small" color="primary" aria-label="Contrôles de Marmiton">
 							<Button variant="outlined" disabled={isLoading} onClick={handleRandomRecipe} endIcon={<AutorenewIcon />}>
 								Recette aléatoire
@@ -340,7 +351,7 @@ function HomeScreen() {
 								</div>
 							)}
 						</div>
-                        {/* <iframe src={marmitonUrl} title="Marmiton Recipe" style={{ width: '100%', height: '700px', border: 'none' }}></iframe> */}
+                        <iframe src={marmitonUrl} title="Marmiton Recipe" style={{ width: '100%', height: '700px', border: 'none' }}></iframe>
                     </Paper>
                 </Grid>
             </Grid>
