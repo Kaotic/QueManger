@@ -166,6 +166,7 @@ function HomeScreen() {
 					enqueueSnackbar('Recette supprimée de la liste.', { variant: 'success' });
 					selectedList.recipes = selectedList.recipes.filter((recipe) => recipe.id !== selectedRecipe.id);
 					setSelectedRecipe(null);
+					setMarmitonUrl('');
 					setRemoveRecipeOpen(false);
 				}
 			})
