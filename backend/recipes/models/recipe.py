@@ -26,6 +26,7 @@ class Recipe(models.Model):
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES)
     budget = models.CharField(max_length=10, choices=BUDGET_CHOICES)
     cooking_time = models.IntegerField()
+    rest_time = models.IntegerField()
     preparation_time = models.IntegerField()
     recipe_quantity = models.IntegerField()
 

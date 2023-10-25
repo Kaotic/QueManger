@@ -72,6 +72,7 @@ class MarmitonAPI:
                 difficulty=MarmitonAPI.translate_difficulty(recipe["difficulty"]["token"]),
                 budget=MarmitonAPI.translate_cost(recipe["cost"]["token"]),
                 cooking_time=recipe["cookingTime"],
+                rest_time=recipe["restTime"] if recipe["restTime"] else 0,
                 preparation_time=recipe["preparationTime"],
                 recipe_quantity=recipe["servings"]["count"] if recipe["servings"] else None,
             )
