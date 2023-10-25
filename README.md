@@ -7,6 +7,8 @@
 
 ### Backend
 
+0. Sous Python 3.9.x
+
 1. Naviguez vers le dossier du backend.
 ```bash
 cd backend
