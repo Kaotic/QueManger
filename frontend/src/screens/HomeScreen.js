@@ -54,7 +54,7 @@ function HomeScreen() {
                 {/* Première colonne : Liste de mes recettes */}
                 <Grid item xs={3}>
                     <Paper elevation={3}>
-                        <Typography variant="h6">Listes de recettes</Typography>
+                        <Typography variant="h6" sx={{textAlign: 'center'}}>Listes de recettes</Typography>
                         <List>
                             {recipesList.map((list) => (
                                 <ListItemButton button onClick={() => setSelectedList(list)} key={list.id}>
@@ -74,7 +74,7 @@ function HomeScreen() {
                 {/* Deuxième colonne : Liste des recettes dans la liste sélectionnée */}
                 <Grid item xs={3}>
                     <Paper elevation={3}>
-                        <Typography variant="h6">Recettes dans la liste</Typography>
+                        <Typography variant="h6" sx={{textAlign: 'center'}}>Recettes dans la liste</Typography>
                         <List>
                             {selectedList.recipes?.map((recipe) => (
                                 <ListItemButton button onClick={() => handleSelectRecipe(recipe)} key={recipe.id}>
