@@ -254,7 +254,7 @@ function HomeScreen() {
 						</ButtonGroup>
 					</Box>
                     <Paper elevation={3}>
-                        <Typography variant="h6" sx={{textAlign: 'center'}}>Listes de recettes</Typography>
+                        <Typography variant="h6" sx={{ textAlign: 'center', paddingTop: 1 }}>Listes de recettes</Typography>
                         <List>
                             {recipesList.map((list, index) => (
                                 <ListItemButton disabled={isLoading} onClick={() => setSelectedList(list)} key={index}>
@@ -284,7 +284,7 @@ function HomeScreen() {
 						</ButtonGroup>
 					</Box>
                     <Paper elevation={3}>
-                        <Typography variant="h6" sx={{textAlign: 'center'}}>Recettes dans la liste</Typography>
+                        <Typography variant="h6" sx={{ textAlign: 'center', paddingTop: 1 }}>Recettes dans la liste</Typography>
                         <List>
                             {selectedList.recipes?.map((recipe, index) => (
                                 <ListItemButton disabled={isLoading} onClick={() => handleSelectRecipe(recipe)} key={index}>
@@ -318,7 +318,7 @@ function HomeScreen() {
 					</Box>
                     <Paper elevation={3}>
 						<div style={{ justifyContent: 'center', alignItems: 'center' }}>
-							<Typography variant="h6" sx={{textAlign: 'center'}}>{selectedRecipe?.name || 'Aucune recette sélectionnée'}</Typography>
+							<Typography variant="h6" sx={{ textAlign: 'center', paddingTop: 1 }}>{selectedRecipe?.name || 'Aucune recette sélectionnée'}</Typography>
 							{selectedRecipe && (
 								<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', marginBottom: 0.5 }}>
 									<Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.5rem', marginRight: 1.5 }}>
