@@ -54,8 +54,8 @@ export default function LoginScreen() {
                     navigate('/');
                 }else{
                     enqueueSnackbar('Identifiants incorrects', { variant: 'error' });
+                    setIsLoading(false);
                 }
-                setIsLoading(false);
             })
             .catch((error) => {
                 enqueueSnackbar('Identifiants incorrects', { variant: 'error' });
@@ -121,7 +121,7 @@ export default function LoginScreen() {
                             <Grid item xs>
                             </Grid>
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/register" variant="body2">
                                     {"Vous n'avez pas de compte? S'inscrire"}
                                 </Link>
                             </Grid>
