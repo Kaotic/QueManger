@@ -31,7 +31,10 @@ def proxy_image(request):
         # Convert the image to bytes again and serve
         byte_array = io.BytesIO()
         image.save(byte_array, format='JPEG')
-        return HttpResponse(byte_array.getvalue(), content_type="image/jpeg")
 
+        http_response = HttpResponse(byte_array.getvalue(), content_type="image/jpeg")
+        http_response["Cache-Control"] = "public, max-age=86400"
+
+        return http_response
     except Exception as e:
         return HttpResponse(str(e), status=500)
