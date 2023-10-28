@@ -13,14 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import path, re_path
+from django.shortcuts import render
 from rest_framework_simplejwt.views import TokenRefreshView
+
+from QueManger.settings import FRONTEND_DIR
 
 from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration, fetch_marmiton_url, proxy_image
 from .api import GetAllUserRecipeLists, CreateUserRecipeList, RemoveUserRecipeList, GetUserRecipeList, AddRecipeToUserRecipeList, RemoveRecipeFromUserRecipeList, ShopListForUserRecipeList
 
 from .views import RecipeListCreate, recipe_list, profile_get
 from .views import IngredientListCreate, ingredient_list
+
+
+def index(request):
+    return render(request, FRONTEND_DIR / 'index.html')
+
 
 urlpatterns = [
     # Proxy Image
@@ -53,4 +61,7 @@ urlpatterns = [
 
     path('ingredients/', IngredientListCreate.as_view(), name='ingredients-list-create'),
     path('ingredients/list', ingredient_list, name='ingredients-list'),
+
+    # Frontend
+    re_path(r'^.*$', index, name='index'),
 ]
