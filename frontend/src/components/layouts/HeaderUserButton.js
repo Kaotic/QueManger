@@ -100,7 +100,7 @@ export default function HeaderUserButton() {
                 open={open}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleClose}>
+                {/* <MenuItem onClick={handleClose}>
                     <ManageAccountsIcon />
                     Profil
                 </MenuItem>
@@ -112,7 +112,7 @@ export default function HeaderUserButton() {
                     <AppsIcon />
                     Mes ingrédients
                 </MenuItem>
-                <Divider />
+                <Divider /> */}
                 <MenuItem onClick={handleLogout}>
                     <LogoutIcon />
                     Déconnexion
