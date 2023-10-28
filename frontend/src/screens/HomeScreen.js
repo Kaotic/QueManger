@@ -20,6 +20,7 @@ import moment from 'moment/moment';
 import { red } from '@mui/material/colors';
 import { translateCost, translateDifficulty, translateTime } from '../utils/translation';
 import { useSnackbar } from 'notistack';
+import ShopListDialog from '../components/dialogs/ShopListDialog';
 
 function HomeScreen() {
 	const { enqueueSnackbar } = useSnackbar();
@@ -32,8 +33,11 @@ function HomeScreen() {
 	const [selectedRecipe, setSelectedRecipe] = React.useState(null);
 	const [marmitonUrl, setMarmitonUrl] = React.useState('');
 
+	const [shopListDialogOpen, setShopListDialogOpen] = React.useState(false);
+
 	const [removeListOpen, setRemoveListOpen] = React.useState(false);
 	const [removeRecipeOpen, setRemoveRecipeOpen] = React.useState(false);
+
 
 	const refreshLists = () => {
 		setIsLoading(true);
@@ -131,6 +135,8 @@ function HomeScreen() {
 			setIsLoading(false);
 			return;
 		}
+
+		setShopListDialogOpen(true);
 	};
 
 	const handleRemoveRecipeFromList = () => {
@@ -271,7 +277,7 @@ function HomeScreen() {
 									</ListItemAvatar>
 									<ListItemText primary={`Semaine ${list.date_week} (${moment(list.date_created).format('DD/MM/YYYY')})`} secondary={`Contient ${list.recipes.length} recette${list.recipes.length > 1 ? 's' : ''}`} />
 									<ListItemIcon>
-										{list.id === selectedList.id ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+										{list.id === selectedList?.id ? <CheckBoxIcon color="primary" /> : <CheckBoxOutlineBlankIcon />}
 									</ListItemIcon>
                                 </ListItemButton>
                             ))}
@@ -334,7 +340,7 @@ function HomeScreen() {
 										}
 									/>
 									<ListItemIcon>
-										{recipe.id === selectedRecipe?.id ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+										{recipe.id === selectedRecipe?.id ? <CheckBoxIcon color="primary" /> : <CheckBoxOutlineBlankIcon />}
 									</ListItemIcon>
 								</ListItemButton>
                             ))}
@@ -387,6 +393,7 @@ function HomeScreen() {
             </Grid>
 
 			<div>
+				<ShopListDialog open={shopListDialogOpen} setOpen={setShopListDialogOpen} userRecipeId={selectedList?.id} />
 				<Dialog open={removeListOpen} onClose={handleRemoveListClose}>
 					<DialogTitle>Suppression de la liste</DialogTitle>
 					<DialogContent>
