@@ -54,6 +54,14 @@ function HomeScreen() {
 			.catch((error) => {
 				console.log(error);
 				setIsLoading(false);
+				switch(error?.response?.status) {
+					case 401:
+						enqueueSnackbar("Une erreur d'authentification s'est produite. Si le problème persiste veuillez vous déconnecter puis vous reconnecter.", { variant: 'error' });
+						break;
+					default:
+						enqueueSnackbar('Une erreur est survenue lors de la récupération des listes de recettes !', { variant: 'error' });
+						break;
+				}
 			});
 	};
 
