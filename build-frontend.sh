@@ -10,6 +10,7 @@ echo "Moving to frontend directory..."
 cd frontend
 
 echo "Building frontend..."
+npm install
 npm run build --prod
 echo "Build complete!"
 if [ ! -d "build" ]; then

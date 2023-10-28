@@ -10,6 +10,7 @@ echo Moving to frontend directory...
 cd frontend
 
 echo Building frontend...
+call npm install
 call npm run build --prod
 echo Build complete!
 IF NOT EXIST "build\" (
