@@ -7,7 +7,7 @@ const environments = {
         apiUrl: "http://localhost:8000/",
     },
     "PROD": {
-        apiUrl: "https://api.que-manger.kao.cx/",
+        apiUrl: "https://que-manger.kao.cx/",
     }
 };
 
