@@ -5,6 +5,21 @@
 
 ## Comment démarrer ?
 
+### Docker
+
+1. Compiler le frontend
+```bash
+chmod +x build-frontend.sh && ./build-frontend.sh
+```
+
+2. Démarrer avec Docker
+```bash
+docker-compose up --build
+```
+
+**QueManger** devrait maintenant être accessible à l'adresse [http://localhost:8000](http://localhost:8000).
+
+
 ### Backend
 
 0. Sous Python 3.9.x
@@ -24,17 +39,23 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-4. Créez un utilisateur super administrateur si vous souhaitez accéder à l'administration [http://localhost:8000/admin/](http://localhost:8000/admin/).
+4. Collecter les fichiers statiques
+```bash
+python manage.py collectstatic
+```
+
+5. Créez un utilisateur super administrateur si vous souhaitez accéder à l'administration [http://localhost:8000/admin/](http://localhost:8000/admin/).
 ```bash
 python manage.py createsuperuser
 ```
 
-5. Démarrez le serveur.
+6. Démarrez le serveur.
 ```bash
 python manage.py runserver
 ```
 
 Votre backend devrait maintenant être en cours d'exécution à l'adresse [http://localhost:8000](http://localhost:8000).
+
 
 ### Frontend
 
@@ -54,6 +75,7 @@ npm start
 ```
 
 Votre frontend devrait maintenant être accessible à l'adresse [http://localhost:3000](http://localhost:3000).
+
 
 ## Contribuer
 
