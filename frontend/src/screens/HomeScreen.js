@@ -41,8 +41,6 @@ function HomeScreen() {
 
 	const refreshLists = () => {
 		setIsLoading(true);
-		setSelectedList([]);
-		setRecipesList([]);
 
 		api.get('/api/user/recipes', { headers: { Authorization: `Bearer ${user.auth.access}` } })
 			.then((response) => {
