@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,10 +29,19 @@ MEDIA_URL = '/media/'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-1b_a%(*t($%clxws0+-bk74x*vp9=*tsvnhdou$it6aw$27hi&'
 
+if os.environ.get('SECRET_KEY'):
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if os.environ.get('PRODUCTION') == 'true':
+    DEBUG = False
+
+ALLOWED_HOSTS = [
+    'localhost',
+    'que-manger.kao.cx',
+]
 
 
 # Application definition
@@ -142,6 +153,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 
 
 # Password validation

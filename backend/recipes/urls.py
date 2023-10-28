@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.urls import path, re_path
 from django.shortcuts import render
+from django.views.static import serve
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from QueManger import settings
 from QueManger.settings import FRONTEND_DIR
 
 from .api import MarmitonRandomJsonAPI, MarmitonAddRandom, MarmitonAddId, AuthTokenObtainPairView, user_registration, fetch_marmiton_url, proxy_image
@@ -61,7 +63,14 @@ urlpatterns = [
 
     path('ingredients/', IngredientListCreate.as_view(), name='ingredients-list-create'),
     path('ingredients/list', ingredient_list, name='ingredients-list'),
+]
 
-    # Frontend
+if settings.DEBUG is False:
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT})
+    ]
+
+# Frontend
+urlpatterns += [
     re_path(r'^.*$', index, name='index'),
 ]
