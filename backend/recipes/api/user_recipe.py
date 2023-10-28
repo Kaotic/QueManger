@@ -152,11 +152,12 @@ class ShopListForUserRecipeList(APIView):
                     for ingredient in ingredients_list:
                         if ingredient["id"] == recipe_ingredient.ingredient.id:
                             ingredient_found = True
-                            if ingredient.get("complement") is None:
-                                ingredient["complement"] = recipe_ingredient.complement
-                            else:
-                                ingredient["complement"] += f" + {recipe_ingredient.complement}"
-                            ingredient["quantity"] += recipe_ingredient.quantity
+                            if recipe_ingredient.complement is not None:
+                                if ingredient.get("complement") is None:
+                                    ingredient["complement"] = recipe_ingredient.complement
+                                else:
+                                    ingredient["complement"] += f" + {recipe_ingredient.complement}"
+                                ingredient["quantity"] += recipe_ingredient.quantity
                             break
 
                     if not ingredient_found:

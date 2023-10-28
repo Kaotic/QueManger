@@ -37,4 +37,5 @@ def proxy_image(request):
 
         return http_response
     except Exception as e:
-        return HttpResponse(str(e), status=500)
+        with open('recipes/static/images/ingredient_default.jpg', 'rb') as default_image:
+            return HttpResponse(default_image.read(), content_type="image/jpeg")
