@@ -304,6 +304,11 @@ function HomeScreen() {
                     <Paper elevation={3}>
                         <Typography variant="h6" sx={{ textAlign: 'center', paddingTop: 1 }}>Recettes dans la liste</Typography>
                         <List>
+							{selectedList.length === 0 && (
+								<ListItem>
+									<ListItemText sx={{ textAlign:'center' }} primary="Aucune liste sélectionnée !" />
+								</ListItem>
+							)}
 							{selectedList.recipes?.length === 0 && (
 								<ListItem>
 									<ListItemText sx={{ textAlign:'center' }} primary="Aucune recette dans la liste !" />
