@@ -79,7 +79,7 @@ function ShopListDialog({ open, setOpen, userListId }) {
 			.finally(() => {
 				setIsLoading(false);
 			});
-	}, [userListId]);
+	}, [open, userListId]);
 
 	return (
 		<Dialog open={open} onClose={handleClose}>
