@@ -6,7 +6,7 @@ function AboutDialog({ open, setOpen }) {
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog keepMounted open={open} onClose={handleClose}>
             <DialogTitle>A propos ?</DialogTitle>
             <DialogContent>
                 <DialogContentText>
