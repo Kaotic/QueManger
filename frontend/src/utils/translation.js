@@ -5,7 +5,7 @@ function secondsToHoursAndMinutes(seconds) {
 }
 
 function translateTime(time1, time2 = 0, time3 = 0) {
-    time = time1;
+    let time = time1;
     time += time2;
     time += time3;
 
@@ -42,8 +42,36 @@ function translateCost(name) {
     }
 }
 
+function translateIngredient(name, quantity, unit_name) {
+    let translation = name;
+
+    if (quantity) {
+        translation += ` (${unit_name ? '' : 'x'}${quantity}${unit_name ? ' ' + unit_name : ''})`;
+    }
+
+    return translation;
+}
+
+function translateIngredientComplement(complement) {
+    if (!complement) {
+        return '';
+    }
+
+    if (complement.startsWith('(') && complement.endsWith(')')) {
+        complement = complement.substring(1, complement.length - 1);
+    }
+
+    if (complement.startsWith('"') && complement.endsWith('"')) {
+        complement = complement.substring(1, complement.length - 1);
+    }
+
+    return complement;
+}
+
 module.exports = {
     translateTime,
     translateDifficulty,
-    translateCost
+    translateCost,
+    translateIngredient,
+    translateIngredientComplement
 }

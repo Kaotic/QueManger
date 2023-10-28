@@ -393,7 +393,7 @@ function HomeScreen() {
             </Grid>
 
 			<div>
-				<ShopListDialog open={shopListDialogOpen} setOpen={setShopListDialogOpen} userRecipeId={selectedList?.id} />
+				<ShopListDialog open={shopListDialogOpen} setOpen={setShopListDialogOpen} userListId={selectedList?.id} />
 				<Dialog open={removeListOpen} onClose={handleRemoveListClose}>
 					<DialogTitle>Suppression de la liste</DialogTitle>
 					<DialogContent>
