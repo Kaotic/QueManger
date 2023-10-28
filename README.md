@@ -1,5 +1,9 @@
 # QueManger
 
+
+https://github.com/Kaotic/QueManger/assets/1755762/e7845f60-5ebe-4ef4-a732-655c230f59a5
+
+
 ## Description
 **QueManger** est la solution à tous vos dilemmes culinaires ! Vous êtes-vous déjà demandé ce que vous alliez manger ce soir ? Ou bien avez-vous déjà oublié un ingrédient crucial pendant vos courses ? Avec QueManger, ces problèmes appartiennent désormais au passé. Notre application vous offre la possibilité de créer une liste de recettes basée sur vos préférences, des filtres spécifiques, ou même de manière totalement aléatoire pour chaque semaine. À la fin, QueManger vous génère une liste de courses complète pour toute la semaine, garantissant que vous ne manquiez plus jamais d'un ingrédient.
 
