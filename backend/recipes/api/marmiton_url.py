@@ -24,21 +24,28 @@ def fetch_marmiton_url(request):
     soup = BeautifulSoup(content, 'html.parser')
 
     # Trouver la div avec l'id "header" et la supprimer
-    header_div = soup.find(id="header")
+    header_div = soup.find("header", {"class": "mrtn-header"})
     if header_div:
-        header_div.decompose()  # Supprimer la div
+        header_div.decompose()
 
-    # Find div with argument data-ad-sticky-reference with any value
-    ad_div = soup.find("div", {"data-ad-sticky-reference": True})
+    # Pour toutes les divs ad-container trouvées, les supprimer
+    for ad_div in soup.find_all("div", {"class": "ad-container"}):
+        ad_div.decompose()
 
-    # Get main div __next
-    main_div = soup.find(id="__next")
+    # Supprimer la sidebar pour avoir plus de place
+    mrtn_sidebar = soup.find("div", {"class": "mrtn-sidebar"})
+    if mrtn_sidebar:
+        mrtn_sidebar.decompose()
+
+    # Récupérer la div principale
+    main_div = soup.find("div", {"class": "recipeV2-container"})
     if not main_div:
         return JsonResponse({"error": "Main div not found."}, status=500)
 
-    # Clear main div and append ad div
-    main_div.clear()
-    main_div.append(ad_div)
+    # Récupère et rename de la div .mrtn-content vers .custom-recipe-content pour annuler les styles
+    mrtn_content = main_div.find("div", {"class": "mrtn-content"})
+    if mrtn_content:
+        mrtn_content['class'] = ['custom-recipe-content']
 
     html_string = str(soup)
 
